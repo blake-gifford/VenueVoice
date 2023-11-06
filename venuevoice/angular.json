@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "venue-voice": {
+    "venuevoice": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/venue-voice",
+            "outputPath": "dist/venuevoice",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -65,10 +65,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "venue-voice:build:production"
+              "browserTarget": "venuevoice:build:production"
             },
             "development": {
-              "browserTarget": "venue-voice:build:development"
+              "browserTarget": "venuevoice:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -76,7 +76,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "venue-voice:build"
+            "browserTarget": "venuevoice:build"
           }
         },
         "test": {
