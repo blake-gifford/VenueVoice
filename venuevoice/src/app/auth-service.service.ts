@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { sha256 } from 'js-sha256';
 import { base64url } from 'rfc4648';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,18 +16,12 @@ export class AuthServiceService {
   private codeVerifier!: string;
   private codeChallenge!: string;
 
-  constructor(private http: HttpClient) {
-    // this.codeVerifier = this.generateRandomString(128);
-    // // You need to await the promise returned by generateCodeChallenge if it's asynchronous
-    // this.generateCodeChallenge(this.codeVerifier).then(challenge => {
-    //   this.codeChallenge = challenge;
-    // });
-
-    // this.initializePKCE();
-  }
+  constructor(private http: HttpClient) { }
 
   private async initializePKCE() {
     this.codeVerifier = this.generateRandomString(128);
+    console.log('this is the OG CodeVerifier ', this.codeVerifier);
+    localStorage.setItem('code_verifier', this.codeVerifier);
     this.codeChallenge = await this.generateCodeChallenge(this.codeVerifier);
   }
 
@@ -45,8 +40,9 @@ export class AuthServiceService {
       'Authorization': `Bearer ${accessToken}`
     });
 
-    return this.http.get('https://api.spotify.com/v1/me/top/tracks', { headers })
-      .toPromise()
+    const tracksObservable = this.http.get('https://api.spotify.com/v1/me/top/tracks', { headers });
+
+    return firstValueFrom(tracksObservable)
       .then(response => {
         console.log('Received response from Spotify', response); // Log the response from the HTTP request
         return response;
@@ -59,13 +55,17 @@ export class AuthServiceService {
 
 
   async initiateAuthFlow() {
-    // Ensure PKCE values are initialized
     if (!this.codeChallenge) {
       await this.initializePKCE();
     }
 
-    // Now it's safe to use this.codeChallenge
-    const authUrl = `${this.spotifyAuthUrl}?client_id=${encodeURIComponent(this.clientId)}&response_type=code&redirect_uri=${encodeURIComponent(this.redirectUri)}&code_challenge_method=S256&code_challenge=${encodeURIComponent(this.codeChallenge)}&scope=${encodeURIComponent('user-read-private user-read-email')}`;
+    const authUrl = `${this.spotifyAuthUrl}?` +
+      `client_id=${encodeURIComponent(this.clientId)}` +
+      `&response_type=code` +
+      `&redirect_uri=${encodeURIComponent(this.redirectUri)}` +
+      `&code_challenge_method=S256` +
+      `&code_challenge=${encodeURIComponent(this.codeChallenge)}` + // Ensure this is URL-encoded
+      `&scope=${encodeURIComponent('user-read-private user-read-email user-top-read')}`;
 
     window.location.href = authUrl;
   }
@@ -84,10 +84,12 @@ export class AuthServiceService {
     const digest = hash.hex();
     // Convert the hex string to a Uint8Array
     const buffer = this.hexToUint8Array(digest);
-    // Base64url encode the Uint8Array
-    const base64Digest = base64url.stringify(buffer);
+    // Base64url encode the Uint8Array and remove padding
+    const base64Digest = base64url.stringify(buffer).replace(/=*$/, '');
     return base64Digest;
   }
+
+
 
   private hexToUint8Array(hexString: string): Uint8Array {
     return new Uint8Array(hexString.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
@@ -103,12 +105,19 @@ export class AuthServiceService {
       return; // No authorization code present, handle accordingly
     }
 
+    const codeVerifier = localStorage.getItem('code_verifier');
+    if (!codeVerifier) {
+      console.error('Code verifier not found in localStorage');
+      return; // Handle the missing code_verifier appropriately
+    }
+
+    // Use the retrieved codeVerifier for the token exchange request
     const body = new URLSearchParams();
     body.set('client_id', this.clientId);
     body.set('grant_type', 'authorization_code');
     body.set('code', authorizationCode);
     body.set('redirect_uri', this.redirectUri);
-    body.set('code_verifier', this.codeVerifier);
+    body.set('code_verifier', codeVerifier);
 
     console.log('this is a TESTTTTTTTTTTT')
     try {

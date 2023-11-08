@@ -28,4 +28,15 @@ export class NavBarComponent implements OnInit {
     console.log("Login");
   }
 
+  getTopTracks() {
+    this.authService.getUserTopTracks()
+      .then(tracks => {
+        this.topTracks = tracks;
+        console.log('this is the tracks ', this.topTracks);
+      })
+      .catch(error => {
+        console.error('Error fetching top tracks:', error);
+      });
+  }
+
 }
