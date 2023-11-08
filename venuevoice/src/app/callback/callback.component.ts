@@ -13,12 +13,12 @@ export class CallbackComponent implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
-      console.log('Query Params:', params);
-      const code = params['code'];
-      if (code) {
-        this.authService.handleAuthRedirect(code); // Make sure this matches the method in your AuthService
+      console.log('CallbackComponent queryParams:', params);
+      if (params['code']) {
+        this.authService.handleAuthRedirect(params);
+      } else {
+        console.error('No authorization code present in the query parameters.');
       }
-      // Handle other cases, such as error or state
     });
   }
 }

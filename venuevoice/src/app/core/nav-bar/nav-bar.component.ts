@@ -1,7 +1,4 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { sha256 } from 'js-sha256'; // You may need to install this library or another to perform SHA-256 hashing
-import { base64url } from 'rfc4648';
 import { AuthServiceService } from 'src/app/auth-service.service';
 
 @Component({
@@ -15,10 +12,11 @@ export class NavBarComponent implements OnInit {
   constructor(private authService: AuthServiceService) { }
 
   ngOnInit(): void {
+    console.log('this is calling get user top tracks')
     this.authService.getUserTopTracks()
       .then(tracks => {
         this.topTracks = tracks;
-        console.log(this.topTracks);
+        console.log('this is the tracks ', this.topTracks);
       })
       .catch(error => {
         console.error('Error fetching top tracks:', error);

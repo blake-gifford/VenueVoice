@@ -12,32 +12,59 @@ export class AuthServiceService {
   private redirectUri: string = 'http://localhost:4200/callback';
   private spotifyAuthUrl: string = 'https://accounts.spotify.com/authorize';
   private tokenEndpoint: string = 'https://accounts.spotify.com/api/token';
-  private codeVerifier: string = this.generateRandomString(128);
-  private codeChallenge: string = this.generateCodeChallenge(this.codeVerifier);
+  private codeVerifier!: string;
+  private codeChallenge!: string;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    // this.codeVerifier = this.generateRandomString(128);
+    // // You need to await the promise returned by generateCodeChallenge if it's asynchronous
+    // this.generateCodeChallenge(this.codeVerifier).then(challenge => {
+    //   this.codeChallenge = challenge;
+    // });
+
+    // this.initializePKCE();
+  }
+
+  private async initializePKCE() {
+    this.codeVerifier = this.generateRandomString(128);
+    this.codeChallenge = await this.generateCodeChallenge(this.codeVerifier);
+  }
 
   getUserTopTracks(): Promise<any> {
-    const accessToken = this.getAccessToken(); // Implement this method based on how you've stored the access token
+    console.log('Attempting to fetch user top tracks'); // Log before attempting to get the token
+
+    const accessToken = this.getAccessToken();
     if (!accessToken) {
-      console.error('Access Token not found!!!!!!');
+      console.error('Access Token not found!');
       return Promise.reject('Access Token not found');
     }
+
+    console.log('Access Token found, making HTTP request'); // Log after token is confirmed
 
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${accessToken}`
     });
 
-    return this.http.get('https://api.spotify.com/v1/me/top/tracks', { headers }).toPromise();
+    return this.http.get('https://api.spotify.com/v1/me/top/tracks', { headers })
+      .toPromise()
+      .then(response => {
+        console.log('Received response from Spotify', response); // Log the response from the HTTP request
+        return response;
+      })
+      .catch(error => {
+        console.error('Error during HTTP request', error); // Log any errors during the HTTP request
+        return Promise.reject(error);
+      });
   }
 
-  async initiateAuthFlow() {
-    // Step 1: Create and store the code verifier
-    this.codeVerifier = this.generateRandomString(128);
-    // Step 2: Create the code challenge
-    this.codeChallenge = await this.generateCodeChallenge(this.codeVerifier);
 
-    // Step 3: Redirect to Spotify authorization page
+  async initiateAuthFlow() {
+    // Ensure PKCE values are initialized
+    if (!this.codeChallenge) {
+      await this.initializePKCE();
+    }
+
+    // Now it's safe to use this.codeChallenge
     const authUrl = `${this.spotifyAuthUrl}?client_id=${encodeURIComponent(this.clientId)}&response_type=code&redirect_uri=${encodeURIComponent(this.redirectUri)}&code_challenge_method=S256&code_challenge=${encodeURIComponent(this.codeChallenge)}&scope=${encodeURIComponent('user-read-private user-read-email')}`;
 
     window.location.href = authUrl;
@@ -46,21 +73,29 @@ export class AuthServiceService {
   // Helper method to generate a random string for the code verifier
   private generateRandomString(length: number): string {
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
-    return new Array(length)
-      .fill(null)
-      .map(() => possible.charAt(Math.floor(Math.random() * possible.length)))
-      .join('');
+    return new Array(length).fill(null).map(() => possible.charAt(Math.floor(Math.random() * possible.length))).join('');
   }
 
-  // Helper method to generate the code challenge from the code verifier
-  private generateCodeChallenge(codeVerifier: string): string {
-    const hashed = sha256.arrayBuffer(codeVerifier); // sha256 function returns an ArrayBuffer
-    const base64Digest = base64url.stringify(new Uint8Array(hashed)); // Use stringify for Uint8Array
+  private async generateCodeChallenge(codeVerifier: string): Promise<string> {
+    // Generate SHA256 hash of the code verifier
+    const hash = sha256.create();
+    hash.update(codeVerifier);
+    // Use the digest method to get the hash as a hex string
+    const digest = hash.hex();
+    // Convert the hex string to a Uint8Array
+    const buffer = this.hexToUint8Array(digest);
+    // Base64url encode the Uint8Array
+    const base64Digest = base64url.stringify(buffer);
     return base64Digest;
+  }
+
+  private hexToUint8Array(hexString: string): Uint8Array {
+    return new Uint8Array(hexString.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
   }
 
   // Method to handle the redirect URI, should be called from the component that handles the redirect
   async handleAuthRedirect(queryParams: any) {
+    console.log('handleAuthRedirect called with:', queryParams);
     const authorizationCode = queryParams['code'];
     console.log('Authorization Code:', authorizationCode);
     if (!authorizationCode) {
@@ -75,6 +110,7 @@ export class AuthServiceService {
     body.set('redirect_uri', this.redirectUri);
     body.set('code_verifier', this.codeVerifier);
 
+    console.log('this is a TESTTTTTTTTTTT')
     try {
       const response: any = await this.http.post(this.tokenEndpoint, body.toString(), {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -105,6 +141,7 @@ export class AuthServiceService {
   private getAccessToken(): string | null {
     // Retrieve the access token from wherever you have stored it
     // This could be in local storage, session storage, a service, etc.
+    console.log('this is the access token  ', localStorage.getItem('spotify_access_token'))
     return localStorage.getItem('spotify_access_token');
   }
 }

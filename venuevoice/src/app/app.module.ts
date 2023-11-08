@@ -20,10 +20,10 @@ import { CallbackComponent } from './callback/callback.component';
   bootstrap: [AppComponent],
   imports: [
     BrowserModule,
-    AppRoutingModule,
     BrowserAnimationsModule,
     CoreModule,
-    HttpClientModule
+    HttpClientModule,
+    AppRoutingModule,
   ]
 })
 export class AppModule { }
