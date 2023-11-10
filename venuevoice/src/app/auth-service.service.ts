@@ -40,7 +40,7 @@ export class AuthServiceService {
       'Authorization': `Bearer ${accessToken}`
     });
 
-    const tracksObservable = this.http.get('https://api.spotify.com/v1/me/top/tracks', { headers });
+    const tracksObservable = this.http.get('https://api.spotify.com/v1/artists/2CIMQHirSU0MQqyYHq0eOx', { headers });
 
     return firstValueFrom(tracksObservable)
       .then(response => {

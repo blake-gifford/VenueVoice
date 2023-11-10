@@ -1,66 +1,143 @@
-.dashboard-background {
-    background-color: #212121;
-    width: 100vw;
-    height: 100vh;
-    padding-left: 20%;
-    color: whitesmoke;
-    overflow-x: hidden;
-    display: flex;
-    flex-wrap: wrap;
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); // 4 columns
+    grid-gap: 8px;
+    justify-content: center; // Center-align the grid items
+    align-items: start; // Align items to the start of each row
+    padding: 8px;
+    background-color: #121212;
+    margin-left: 15%;
+    padding-right: 2%;
 }
 
-.card-div-container {
-    padding-top: 3%;
+// Other styles remain the same
+
+
+.card {
+    mat-card {
+        // Your existing mat-card styles
+        transition: transform .3s; // faster animation
+
+        &:hover {
+            transform: scale(1.03); // subtle scaling
+        }
+
+        mat-card {
+            background-color: #181818; // Spotify's card color
+            color: #fff;
+            box-shadow: none; // remove shadow for a flat design
+
+            mat-card-content {
+                padding: 8px; // reduced padding
+            }
+
+            img {
+                border-radius: 4px; // smaller border radius
+                height: 100px; // fixed height for uniformity
+                object-fit: cover; // ensure the image covers the card area
+            }
+
+            h2 {
+                font-size: 0.8em; // smaller font size
+                margin-top: 4px; // space from image to text
+                color: #1db954; // Spotify's highlight color
+                white-space: nowrap; // ensure the title stays in a single line
+                overflow: hidden;
+                text-overflow: ellipsis; // add ellipsis for overflowed text
+            }
+        }
+    }
 }
 
-.info-card {
-    background: linear-gradient(45deg, #3498db, #6c5ce7);
-    border-radius: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    color: #fff;
-    text-align: center;
-    padding: 20px;
-    transition: transform 0.2s ease-in-out;
-    overflow: hidden;
-    position: relative;
-    width: 20%;
-    margin: 2% 2%;
-    max-height: 35vh;
-
+@media (max-width: 1200px) {
+    .dashboard {
+        grid-template-columns: repeat(3, 1fr); // 3 columns for smaller screens
+    }
 }
 
-.info-card img {
-    max-width: 100%;
-    border-radius: 15px;
-    transition: transform 0.2s ease-in-out;
+@media (max-width: 992px) {
+    .dashboard {
+        grid-template-columns: repeat(2, 1fr); // 2 columns for tablets
+    }
 }
 
-.info-card h2 {
-    font-size: 24px;
-    margin: 15px 0;
+@media (max-width: 768px) {
+    .dashboard {
+        grid-template-columns: 1fr; // 1 column for mobile
+    }
 }
 
-.info-card:hover {
-    transform: scale(1.05);
-}
 
-.info-card:hover img {
-    transform: scale(1.1);
-}
 
-.info-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 15px;
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-}
 
-.info-card:hover::before {
-    opacity: 1;
-}
+
+
+
+
+
+// .dashboard-background {
+//     background-color: #212121;
+//     width: 100vw;
+//     height: 100vh;
+//     padding-left: 20%;
+//     color: whitesmoke;
+//     overflow-x: hidden;
+//     display: flex;
+//     flex-wrap: wrap;
+// }
+
+// .card-div-container {
+//     padding-top: 3%;
+// }
+
+// .info-card {
+//     background: linear-gradient(45deg, #3498db, #6c5ce7);
+//     border-radius: 15px;
+//     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+//     color: #fff;
+//     text-align: center;
+//     padding: 20px;
+//     transition: transform 0.2s ease-in-out;
+//     overflow: hidden;
+//     position: relative;
+//     width: 20%;
+//     margin: 2% 2%;
+//     max-height: 35vh;
+
+// }
+
+// .info-card img {
+//     max-width: 100%;
+//     border-radius: 15px;
+//     transition: transform 0.2s ease-in-out;
+// }
+
+// .info-card h2 {
+//     font-size: 24px;
+//     margin: 15px 0;
+// }
+
+// .info-card:hover {
+//     transform: scale(1.05);
+// }
+
+// .info-card:hover img {
+//     transform: scale(1.1);
+// }
+
+// .info-card::before {
+//     content: '';
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     width: 100%;
+//     height: 100%;
+//     background: rgba(0, 0, 0, 0.4);
+//     border-radius: 15px;
+//     opacity: 0;
+//     transition: opacity 0.2s ease-in-out;
+// }
+
+// .info-card:hover::before {
+//     opacity: 1;
+// }

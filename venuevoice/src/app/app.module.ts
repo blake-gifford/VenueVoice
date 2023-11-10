@@ -8,6 +8,8 @@ import { CoreModule } from "./core/core.module";
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { HttpClientModule } from '@angular/common/http';
 import { CallbackComponent } from './callback/callback.component';
+import { MatCardModule } from '@angular/material/card';
+
 
 @NgModule({
   declarations: [
@@ -24,6 +26,7 @@ import { CallbackComponent } from './callback/callback.component';
     CoreModule,
     HttpClientModule,
     AppRoutingModule,
+    MatCardModule,
   ]
 })
 export class AppModule { }
