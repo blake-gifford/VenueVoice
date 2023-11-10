@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { sha256 } from 'js-sha256';
 import { base64url } from 'rfc4648';
-import { firstValueFrom } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -25,32 +25,23 @@ export class AuthServiceService {
     this.codeChallenge = await this.generateCodeChallenge(this.codeVerifier);
   }
 
-  getUserTopTracks(): Promise<any> {
-    console.log('Attempting to fetch user top tracks'); // Log before attempting to get the token
+  getUserTopTracks(): Observable<any> {
+    console.log('Attempting to fetch user top tracks');
 
     const accessToken = this.getAccessToken();
     if (!accessToken) {
       console.error('Access Token not found!');
-      return Promise.reject('Access Token not found');
+      throw new Error('Access Token not found'); // Throw an error or return an Observable error
     }
 
-    console.log('Access Token found, making HTTP request'); // Log after token is confirmed
+    console.log('Access Token found, making HTTP request');
 
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${accessToken}`
     });
 
-    const tracksObservable = this.http.get('https://api.spotify.com/v1/artists/2CIMQHirSU0MQqyYHq0eOx', { headers });
-
-    return firstValueFrom(tracksObservable)
-      .then(response => {
-        console.log('Received response from Spotify', response); // Log the response from the HTTP request
-        return response;
-      })
-      .catch(error => {
-        console.error('Error during HTTP request', error); // Log any errors during the HTTP request
-        return Promise.reject(error);
-      });
+    // Just return the Observable here
+    return this.http.get('https://api.spotify.com/v1/me/top/tracks', { headers });
   }
 
 

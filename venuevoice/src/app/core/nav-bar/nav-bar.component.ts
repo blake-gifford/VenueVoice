@@ -13,14 +13,14 @@ export class NavBarComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('this is calling get user top tracks')
-    this.authService.getUserTopTracks()
-      .then(tracks => {
-        this.topTracks = tracks;
-        console.log('this is the tracks ', this.topTracks);
-      })
-      .catch(error => {
-        console.error('Error fetching top tracks:', error);
-      });
+    // this.authService.getUserTopTracks()
+    //   .then(tracks => {
+    //     this.topTracks = tracks;
+    //     console.log('this is the tracks ', this.topTracks);
+    //   })
+    //   .catch(error => {
+    //     console.error('Error fetching top tracks:', error);
+    //   });
   }
 
   login() {
@@ -28,15 +28,15 @@ export class NavBarComponent implements OnInit {
     console.log("Login");
   }
 
-  getTopTracks() {
-    this.authService.getUserTopTracks()
-      .then(tracks => {
-        this.topTracks = tracks;
-        console.log('this is the tracks ', this.topTracks);
-      })
-      .catch(error => {
-        console.error('Error fetching top tracks:', error);
-      });
-  }
+  // getTopTracks() {
+  //   this.authService.getUserTopTracks()
+  //     .then(tracks => {
+  //       this.topTracks = tracks;
+  //       console.log('this is the tracks ', this.topTracks);
+  //     })
+  //     .catch(error => {
+  //       console.error('Error fetching top tracks:', error);
+  //     });
+  // }
 
 }
